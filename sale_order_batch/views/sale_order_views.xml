@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="view_order_form_inherit_batch" model="ir.ui.view">
+                <field name="name">sale.order.form.inherit.batch</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_order_form"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//button[@name='action_draft']" position="after">
+                                <button name="action_add_to_batch" type="object" string="Add to Batch" data-hotkey="b"/>
+                                <!-- attrs="invisible: {"|",('batch_id', '=', True),('state','not in',['draft', 'sent'])}" -->
+                        </xpath>
+                </field>
+        </record>
+
+        <record id="view_order_list_inherit_batch" model="ir.ui.view">
+                <field name="name">sale.order.list.view.inherited</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_quotation_tree"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//tree" position="inside">
+                                <header>
+                                        <button type="object" name="action_add_to_batch" string="Add to Batch"/>
+                                </header>
+                        </xpath>
+                </field>
+        </record>
+</odoo>

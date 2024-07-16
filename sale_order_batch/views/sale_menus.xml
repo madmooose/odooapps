@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem
+        id="menu_sale_order_batch"
+        name="Order Batches"
+        action="action_batch"
+        parent="sale.sale_order_menu"
+        groups="sales_team.group_sale_salesman"
+        sequence="25"
+    />
+</odoo>

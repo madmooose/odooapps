@@ -1,0 +1,115 @@
+from odoo import _, api, fields, models
+
+
+STATES = [("open", "Open"), ("close", "Close")]
+
+
+class SaleOrderBatch(models.Model):
+    """Group serveral Sale Orders into a batch"""
+
+    _name = "sale.order.batch"
+    _description = "Sale Order Batch"
+    _inherit = "mail.thread"
+    _order = "date_order desc, id desc"
+
+    name = fields.Char(
+        string="Order Batch Reference",
+        required=True,
+        copy=False,
+        readonly=True,
+        index="trigram",
+        default=lambda self: _("New"),
+    )
+    state = fields.Selection(
+        selection=[("open", "Open"), ("closed", "Closed")],
+        string="Status",
+        readonly=True,
+        copy=False,
+        index=True,
+        tracking=1,
+        default="open",
+    )
+    date_order = fields.Datetime(
+        string="Order Date",
+        required=True,
+        readonly=False,
+        copy=False,
+        states={"closed": [("readonly", False)]},
+        help="Creation date of order batch,\nConfirmation date of confirmed orders.",
+        default=fields.Datetime.now,
+    )
+    validity_date = fields.Date(compute="_compute_validity_date")
+    sale_order_ids = fields.One2many("sale.order", "batch_id")
+    sale_order_count = fields.Integer(compute="_compute_sale_order_count")
+    sale_order_line_ids = fields.Many2many("sale.order.line", compute="_compute_sale_order_line_ids", store=True)
+    product_ids = fields.Many2many("product.product", compute="_compute_product_ids")
+    product_count = fields.Integer(compute="_compute_product_count")
+
+    @api.depends("sale_order_ids.validity_date")
+    def _compute_validity_date(self):
+        for batch in self:
+            if batch.sale_order_ids:
+                batch.validity_date = min(batch.sale_order_ids.mapped("validity_date"))
+            else:
+                batch.validity_date = False
+
+    @api.depends("sale_order_ids")
+    def _compute_sale_order_count(self):
+        for batch in self:
+            batch.sale_order_count = len(batch.sale_order_ids)
+
+    @api.depends("sale_order_ids.order_line")
+    def _compute_product_ids(self):
+        for sale_order in self:
+            sale_order.product_ids = sale_order.sale_order_ids.mapped("order_line").mapped("product_id")
+
+    @api.depends("sale_order_ids.order_line")
+    def _compute_sale_order_line_ids(self):
+        for sale_order in self:
+            sale_order.sale_order_line_ids = sale_order.sale_order_ids.mapped("order_line")
+
+    @api.depends("product_ids")
+    def _compute_product_count(self):
+        for batch in self:
+            batch.product_count = len(batch.product_ids)
+
+    def action_view_source_sale_orders(self):
+        self.ensure_one()
+        result = self.env["ir.actions.act_window"]._for_xml_id("sale.action_orders")
+        if len(self.sale_order_ids) > 1:
+            result["domain"] = [("id", "in", self.sale_order_ids.ids)]
+        elif len(self.sale_order_ids) == 1:
+            result["views"] = [(self.env.ref("sale.view_order_form", False).id, "form")]
+            result["res_id"] = self.sale_order_ids.id
+        else:
+            result = {"type": "ir.actions.act_window_close"}
+        return result
+
+    def action_view_products(self):
+        self.ensure_one()
+        result = self.env["ir.actions.act_window"]._for_xml_id("product.product_normal_action_sell")
+        if len(self.product_ids) > 1:
+            result["domain"] = [("id", "in", self.product_ids.ids)]
+        elif len(self.product_ids) == 1:
+            result["views"] = [(self.env.ref("product.product_product_tree_view", False).id, "form")]
+            result["res_id"] = self.product_ids.id
+        else:
+            result = {"type": "ir.actions.act_window_close"}
+        return result
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if "company_id" in vals:
+                self = self.with_company(vals["company_id"])
+            if vals.get("name", _("New")) == _("New"):
+                seq_date = (
+                    fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(vals["date_order"]))
+                    if "date_order" in vals
+                    else None
+                )
+                vals["name"] = self.env["ir.sequence"].next_by_code("sale.order.batch", sequence_date=seq_date) or _(
+                    "New"
+                )
+
+        return super().create(vals_list)
