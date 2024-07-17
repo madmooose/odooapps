@@ -42,6 +42,7 @@ class SaleOrderBatch(models.Model):
     sale_order_ids = fields.One2many("sale.order", "batch_id")
     sale_order_count = fields.Integer(compute="_compute_sale_order_count")
     sale_order_line_ids = fields.Many2many("sale.order.line", compute="_compute_sale_order_line_ids", store=True)
+    amount_total = fields.Float(compute="_compute_amount_total", string="Total")
     product_ids = fields.Many2many("product.product", compute="_compute_product_ids")
     product_count = fields.Integer(compute="_compute_product_count")
 
@@ -67,6 +68,11 @@ class SaleOrderBatch(models.Model):
     def _compute_sale_order_line_ids(self):
         for sale_order in self:
             sale_order.sale_order_line_ids = sale_order.sale_order_ids.mapped("order_line")
+
+    @api.depends("sale_order_ids.amount_total")
+    def _compute_amount_total(self):
+        for batch in self:
+            batch.amount_total = sum(batch.sale_order_ids.mapped("amount_total"))
 
     @api.depends("product_ids")
     def _compute_product_count(self):
@@ -97,6 +103,13 @@ class SaleOrderBatch(models.Model):
             result = {"type": "ir.actions.act_window_close"}
         return result
 
+    def action_confirm(self):
+        for batch in self:
+            orders = batch.with_context(bypass_batch=True).sale_order_ids
+            orders.action_confirm()
+            batch.state = "closed"
+        return True
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -111,5 +124,4 @@ class SaleOrderBatch(models.Model):
                 vals["name"] = self.env["ir.sequence"].next_by_code("sale.order.batch", sequence_date=seq_date) or _(
                     "New"
                 )
-
         return super().create(vals_list)

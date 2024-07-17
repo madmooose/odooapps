@@ -1,13 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <record id="view_order_form_inherit_batch" model="ir.ui.view">
+        <record id="view_order_form" model="ir.ui.view">
                 <field name="name">sale.order.form.inherit.batch</field>
                 <field name="model">sale.order</field>
                 <field name="inherit_id" ref="sale.view_order_form"/>
                 <field name="arch" type="xml">
                         <xpath expr="//button[@name='action_draft']" position="after">
-                                <button name="action_add_to_batch" type="object" string="Add to Batch" data-hotkey="b"/>
-                                <!-- attrs="invisible: {"|",('batch_id', '=', True),('state','not in',['draft', 'sent'])}" -->
+                                <field name="batch_id" invisible="True"/>
+                                <button
+                    name="action_add_to_batch"
+                    type="object"
+                    string="Add to Batch"
+                    data-hotkey="b"
+                    attrs="{'invisible': ['|',('batch_id', '!=', False),('state','not in',['draft', 'sent'])]}"
+                />
+                        </xpath>
+                        <xpath expr="//div[@name='button_box']" position="inside">
+                                <button
+                    class="oe_stat_button"
+                    name="action_view_sale_order_batch"
+                    type="object"
+                    icon="fa-tasks"
+                    attrs="{'invisible': [('batch_id', '=', False)]}"
+                >
+                                        <field name="batch_id" attrs="{'readonly': True}"/>
+                                </button>
+                        </xpath>
+                        <xpath expr="//button[@name='action_confirm']" position="attributes">
+                                <attribute
+                    name="attrs"
+                >{'invisible': ['|',('batch_id','!=',False),('state', 'not in', ['sent'])]}</attribute>
+                        </xpath>
+                        <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                                <attribute
+                    name="attrs"
+                >{'invisible': ['|',('batch_id','!=',False),('state', 'not in', ['draft'])]}</attribute>
                         </xpath>
                 </field>
         </record>

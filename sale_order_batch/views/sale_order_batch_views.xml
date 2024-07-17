@@ -5,10 +5,11 @@
         <field name="model">sale.order.batch</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="state"/>
                 <field name="name"/>
-                <field name="validity_date"/>
+                <field name="date_order"/>
+                <field name="validity_date" optional="hide"/>
                 <field name="sale_order_ids" widget="many2many_tags"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
@@ -19,6 +20,15 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button
+                        name="action_confirm"
+                        id="action_confirm"
+                        data-hotkey="v"
+                        string="Confirm"
+                        class="btn-primary"
+                        type="object"
+                        attrs="{'invisible': [('state', '!=','open')]}"
+                    />
                     <field name="state" widget="statusbar" options="{'clickable': 'true'}"/>
                 </header>
                 <sheet>
@@ -51,12 +61,35 @@
                                 name="sale_order_ids"
                                 widget="many2many_tags"
                                 domain="[('state','in',['draft','sent']),('batch_id','=',False)]"
+                                attrs="{'readonly': [('state','=','closed')]}"
                             />
                         </group>
                         <group>
-                            <field name="validity_date"/>
+                            <field name="date_order" attrs="{'readonly': [('state','=','closed')]}"/>
+                            <field name="validity_date" attrs="{'invisiable': [('state','=','closed')]}"/>
                         </group>
                     </group>
+                    <notebook>
+                        <page string="Sale Order Lines" name="sale_order_line">
+                            <field name="sale_order_line_ids">
+                                <tree>
+                                    <field name="order_partner_id"/>
+                                    <field name="product_template_id"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="price_unit"/>
+                                    <field name="price_subtotal"/>
+                                </tree>
+                            </field>
+                            <group name="note_group" col="6" class="mt-2 mt-md-0">
+                                <group colspan="4">
+                                </group>
+                                <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                                    <field name="amount_total" colspan="2" readonly="1"/>
+                                </group>
+                                <div class="clearfix"/>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
@@ -72,12 +105,8 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
-                <filter
-                    string="Open"
-                    name="filter_property_open"
-                    domain="[('state', '=', 'open')
-                    ]"
-                />
+                <filter string="Open" name="filter_batch_open" domain="[('state', '=', 'open')
+                    ]"/>
             </search>
         </field>
     </record>
@@ -87,18 +116,6 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sale.order.batch</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[]</field>
-        <field name="context">{'search_default_filter_property_open': 1}</field>
+        <field name="context">{'search_default_filter_batch_open': 1}</field>
     </record>
-
-    <record id="action_open_orders" model="ir.actions.act_window">
-        <field name="name">Action Open Orders</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">sale.order</field>
-        <field name="view_mode">tree,form</field>
-        <field name="domain">[('batch_id','=',self.acti)]</field>
-        <field name="context">{'search_default_filter_property_open': 1}</field>
-    </record>
-
-
 </odoo>
