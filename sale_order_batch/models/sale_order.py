@@ -13,7 +13,7 @@ class SaleOrder(models.Model):
         """
         batch = self.env["sale.order.batch"].search([("state", "=", "open")], limit=1)
         if not batch:
-            batch = self.env["sale.order.batch"].create()
+            batch = self.env["sale.order.batch"].create({})
         for sale_order in self:
             if not sale_order.batch_id and sale_order.state in ["draft", "sent"]:
                 sale_order.batch_id = batch

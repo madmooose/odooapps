@@ -39,7 +39,7 @@ class SaleOrderBatch(models.Model):
         required=True,
         readonly=False,
         copy=False,
-        states={"closed": [("readonly", False)]},
+        states={"closed": [("readonly", True)]},
         help="Creation date of order batch,\nConfirmation date of confirmed orders.",
         default=fields.Datetime.now,
     )
