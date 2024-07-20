@@ -5,7 +5,7 @@
     "website": "https://www.bakeup.org",
     "category": "Sale",
     "version": "16.0.0.0.1",
-    "depends": ["sale"],
+    "depends": ["sale", "product"],
     "data": [
         "data/ir_sequence_data.xml",
         "views/sale_order_batch_views.xml",

@@ -12,6 +12,11 @@ class SaleOrderBatch(models.Model):
     _inherit = "mail.thread"
     _order = "date_order desc, id desc"
 
+    # TODO: add company_id to sale order batch
+    # company_id = fields.Many2one(
+    #     related='order_id.company_id',
+    #     store=True, index=True, precompute=True)
+
     name = fields.Char(
         string="Order Batch Reference",
         required=True,
@@ -43,7 +48,7 @@ class SaleOrderBatch(models.Model):
     sale_order_count = fields.Integer(compute="_compute_sale_order_count")
     sale_order_line_ids = fields.Many2many("sale.order.line", compute="_compute_sale_order_line_ids", store=True)
     amount_total = fields.Float(compute="_compute_amount_total", string="Total")
-    product_ids = fields.Many2many("product.product", compute="_compute_product_ids")
+    product_ids = fields.One2many("sale.order.batch.product", "batch_id")
     product_count = fields.Integer(compute="_compute_product_count")
 
     @api.depends("sale_order_ids.validity_date")
@@ -60,14 +65,10 @@ class SaleOrderBatch(models.Model):
             batch.sale_order_count = len(batch.sale_order_ids)
 
     @api.depends("sale_order_ids.order_line")
-    def _compute_product_ids(self):
-        for sale_order in self:
-            sale_order.product_ids = sale_order.sale_order_ids.mapped("order_line").mapped("product_id")
-
-    @api.depends("sale_order_ids.order_line")
     def _compute_sale_order_line_ids(self):
-        for sale_order in self:
-            sale_order.sale_order_line_ids = sale_order.sale_order_ids.mapped("order_line")
+        for batch in self:
+            order_lines = self.env["sale.order.line"].search([("order_id", "in", batch.sale_order_ids.ids)])
+            batch.sale_order_line_ids = order_lines
 
     @api.depends("sale_order_ids.amount_total")
     def _compute_amount_total(self):

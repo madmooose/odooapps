@@ -18,15 +18,16 @@ class SaleOrder(models.Model):
             if not sale_order.batch_id and sale_order.state in ["draft", "sent"]:
                 sale_order.batch_id = batch
 
-    def write(self, vals):
-        if "batch_id" in vals:
-            invalid_orders = []
-            for order in self:
-                if order.state not in ["draft", "sent"]:
-                    invalid_orders.append(order.name)
-            if invalid_orders:
-                raise UserError(_(f"Sale Order not in State Draft or Sent: {', '.join(invalid_orders)}"))
-        return super().write(vals)
+    def action_view_sale_order_batch(self):
+        return {
+            "name": _("Sale Order Batch"),
+            "type": "ir.actions.act_window",
+            "view_type": "form",
+            "view_mode": "form",
+            "res_model": "sale.order.batch",
+            "res_id": self.batch_id.id,
+            # 'target': '',
+        }
 
     def action_confirm(self):
         invalid_orders = []
@@ -38,13 +39,15 @@ class SaleOrder(models.Model):
                 raise UserError(_(f"Sale Order belongs to a Batch: {', '.join(invalid_orders)}"))
         return super().action_confirm()
 
-    def action_view_sale_order_batch(self):
-        return {
-            "name": _("Sale Order Batch"),
-            "type": "ir.actions.act_window",
-            "view_type": "form",
-            "view_mode": "form",
-            "res_model": "sale.order.batch",
-            "res_id": self.batch_id.id,
-            # 'target': '',
-        }
+    def write(self, vals):
+        if "batch_id" in vals:
+            invalid_orders = []
+            for order in self:
+                if order.state not in ["draft", "sent"]:
+                    invalid_orders.append(order.name)
+            if invalid_orders:
+                raise UserError(_(f"Sale Order not in State Draft or Sent: {', '.join(invalid_orders)}"))
+        res = super().write(vals)
+        if "batch_id" in vals:
+            self.order_line._update_batch_products()
+        return res

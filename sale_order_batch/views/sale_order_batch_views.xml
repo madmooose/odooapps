@@ -70,11 +70,17 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Sale Order Lines" name="sale_order_line">
-                            <field name="sale_order_line_ids">
-                                <tree>
+                        <page string="Sale Order Lines" name="order_line">
+                            <field
+                                name="sale_order_line_ids"
+                                widget="section_and_note_one2many"
+                                attrs="{'readonly': [('state', 'in', ('closed'))]}"
+                            >
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
                                     <field name="order_partner_id"/>
                                     <field name="product_template_id"/>
+                                    <field name="name"/>
                                     <field name="product_uom_qty"/>
                                     <field name="price_unit"/>
                                     <field name="price_subtotal"/>
@@ -88,6 +94,18 @@
                                 </group>
                                 <div class="clearfix"/>
                             </group>
+                        </page>
+                        <page string="Products" name="products">
+                            <field name="product_ids">
+                                <tree create="0" editable="1">
+                                    <field name="product_template_id"/>
+                                    <field name="product_uom_category_id"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="product_uom"/>
+                                    <field name="product_packaging_id" groups="product.group_stock_packaging"/>
+                                    <field name="product_packaging_qty" groups="product.group_stock_packaging"/>
+                                </tree>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>
