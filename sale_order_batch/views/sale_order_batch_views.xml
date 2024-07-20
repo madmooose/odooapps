@@ -79,6 +79,7 @@
                                 attrs="{'readonly': [('state', 'in', ('closed'))]}"
                             >
                                 <tree>
+                                    <field name="name"/>
                                     <field name="partner_id"/>
                                     <field name="date_order"/>
                                     <field name="amount_untaxed"/>
