@@ -9,6 +9,7 @@
     "data": [
         "data/ir_sequence_data.xml",
         "views/sale_order_batch_views.xml",
+        "views/sale_order_batch_product_views.xml",
         "views/sale_order_views.xml",
         "views/sale_menus.xml",
         "security/ir.model.access.csv",
