@@ -22,7 +22,9 @@ class SaleOrderBatchProduct(models.Model):
     product_template_id = fields.Many2one(
         "product.template", related="product_id.product_tmpl_id", string="Product Template"
     )
-    sale_order_line_ids = fields.Many2many("sale.order.line", compute="_compute_sale_order_line_ids", store=True)
+    sale_order_line_ids = fields.Many2many(
+        "sale.order.line", compute="_compute_sale_order_line_ids", store=True, readonly=False
+    )
     product_uom_category_id = fields.Many2one(related="product_id.uom_id.category_id", depends=["product_id"])
     product_uom_qty = fields.Float(compute="_compute_uom_qty")
     product_uom = fields.Many2one(related="product_id.uom_id")
