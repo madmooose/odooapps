@@ -50,6 +50,7 @@ class SaleOrderBatch(models.Model):
     amount_total = fields.Float(compute="_compute_amount_total", string="Total")
     product_ids = fields.One2many("sale.order.batch.product", "batch_id")
     product_count = fields.Integer(compute="_compute_product_count")
+    partner_credit_warning = fields.Text(compute="_compute_partner_credit_warning")
 
     @api.depends("sale_order_ids.validity_date")
     def _compute_validity_date(self):
@@ -79,6 +80,14 @@ class SaleOrderBatch(models.Model):
     def _compute_product_count(self):
         for batch in self:
             batch.product_count = len(batch.product_ids)
+
+    @api.depends("sale_order_ids.partner_credit_warning")
+    def _compute_partner_credit_warning(self):
+        for batch in self:
+            batch.partner_credit_warning = ""
+            for order in batch.sale_order_ids:
+                if order.partner_credit_warning:
+                    batch.partner_credit_warning += order.partner_credit_warning + "\n"
 
     def action_view_source_sale_orders(self):
         self.ensure_one()
