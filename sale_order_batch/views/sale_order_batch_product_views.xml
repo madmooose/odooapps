@@ -12,10 +12,11 @@
                         <field name="product_id"/>
                     </h1>
                     <group>
-                        <group>
+                        <group name="product_info">
                             <field name="batch_id"/>
+                            <field name="product_uom_qty"/>
                         </group>
-                        <group>
+                        <group name="packaging_info">
                             <field name="product_packaging_id"/>
                             <field name="product_packaging_qty"/>
                         </group>
