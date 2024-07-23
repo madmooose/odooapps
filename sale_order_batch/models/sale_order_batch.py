@@ -47,6 +47,8 @@ class SaleOrderBatch(models.Model):
     sale_order_ids = fields.One2many("sale.order", "batch_id")
     sale_order_count = fields.Integer(compute="_compute_sale_order_count")
     sale_order_line_ids = fields.Many2many("sale.order.line", compute="_compute_sale_order_line_ids", store=True)
+    invoice_ids = fields.Many2many("account.move", compute="_compute_invoice_ids")
+    invoice_count = fields.Integer(compute="_compute_invoice_ids")
     amount_total = fields.Float(compute="_compute_amount_total", string="Total")
     product_ids = fields.One2many("sale.order.batch.product", "batch_id")
     product_count = fields.Integer(compute="_compute_product_count")
@@ -60,16 +62,23 @@ class SaleOrderBatch(models.Model):
             else:
                 batch.validity_date = False
 
-    @api.depends("sale_order_ids")
-    def _compute_sale_order_count(self):
-        for batch in self:
-            batch.sale_order_count = len(batch.sale_order_ids)
-
     @api.depends("sale_order_ids.order_line")
     def _compute_sale_order_line_ids(self):
         for batch in self:
             order_lines = self.env["sale.order.line"].search([("order_id", "in", batch.sale_order_ids.ids)])
             batch.sale_order_line_ids = order_lines
+
+    @api.depends("sale_order_ids")
+    def _compute_sale_order_count(self):
+        for batch in self:
+            batch.sale_order_count = len(batch.sale_order_ids)
+
+    @api.depends("sale_order_ids.invoice_ids")
+    def _compute_invoice_ids(self):
+        for batch in self:
+            invoices = batch.sale_order_ids.mapped("invoice_ids")
+            batch.invoice_ids = invoices
+            batch.invoice_count = len(invoices)
 
     @api.depends("sale_order_ids.amount_total")
     def _compute_amount_total(self):
@@ -112,6 +121,25 @@ class SaleOrderBatch(models.Model):
         else:
             result = {"type": "ir.actions.act_window_close"}
         return result
+
+    def action_view_invoice(self):
+        invoices = self.mapped("invoice_ids")
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_out_invoice_type")
+        if len(invoices) > 1:
+            action["domain"] = [("id", "in", invoices.ids)]
+        elif len(invoices) == 1:
+            form_view = [(self.env.ref("account.view_move_form").id, "form")]
+            if "views" in action:
+                action["views"] = form_view + [(state, view) for state, view in action["views"] if view != "form"]
+            else:
+                action["views"] = form_view
+            action["res_id"] = invoices.id
+        else:
+            action = {"type": "ir.actions.act_window_close"}
+
+        context = {"default_move_type": "out_invoice"}
+        action["context"] = context
+        return action
 
     def action_confirm(self):
         for batch in self:

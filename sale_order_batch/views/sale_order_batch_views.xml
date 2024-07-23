@@ -29,6 +29,19 @@
                         type="object"
                         attrs="{'invisible': [('state', '!=','open')]}"
                     />
+                    <button
+                        id="create_invoices"
+                        name="%(sale.action_view_sale_advance_payment_inv)d"
+                        string="Create Invoices"
+                        type="action"
+                        class="btn-primary"
+                        context="{
+                        'default_sale_order_ids': sale_order_ids,
+                        }"
+                        data-hotkey="q"
+                        attrs="{'invisible': [('state', '!=', 'closed')]}"
+                    />
+
                     <field name="state" widget="statusbar" options="{'clickable': 'true'}"/>
                 </header>
                 <div
@@ -58,6 +71,15 @@
                         >
                             <field string="Products" name="product_count" widget="statinfo"/>
                         </button>
+                        <button
+                            name="action_view_invoice"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            attrs="{'invisible': [('invoice_count', '=', 0)]}"
+                        >
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
                     </div>
                     <h1>
                         <field name="name"/>
@@ -76,7 +98,6 @@
                             <field
                                 name="sale_order_ids"
                                 domain="[('state','in',['draft','sent']),('batch_id','=',False)]"
-                                attrs="{'readonly': [('state', 'in', ('closed'))]}"
                             >
                                 <tree>
                                     <field name="name"/>
@@ -84,6 +105,14 @@
                                     <field name="date_order"/>
                                     <field name="amount_untaxed"/>
                                     <field name="amount_total"/>
+                                    <field
+                                        name="invoice_status"
+                                        decoration-success="invoice_status == 'invoiced'"
+                                        decoration-info="invoice_status == 'to invoice'"
+                                        decoration-warning="invoice_status == 'upselling'"
+                                        widget="badge"
+                                        optional="show"
+                                    />
                                 </tree>
                             </field>
                         </page>
@@ -95,8 +124,9 @@
                             >
                                 <tree editable="bottom">
                                     <field name="sequence" widget="handle"/>
+                                    <field name="order_id"/>
                                     <field name="order_partner_id"/>
-                                    <field name="product_template_id"/>
+                                    <field name="product_template_id" optional="hide"/>
                                     <field name="name"/>
                                     <field name="product_uom_qty"/>
                                     <field name="price_unit"/>
