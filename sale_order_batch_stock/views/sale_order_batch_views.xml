@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_order_batch_form" model="ir.ui.view">
+        <field name="name">sale.order.batch.form.stock</field>
+        <field name="model">sale.order.batch</field>
+        <field name="inherit_id" ref="sale_order_batch.view_order_batch_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_invoice']" position="before">
+                    <button
+                    type="object"
+                    name="action_view_delivery"
+                    class="oe_stat_button"
+                    icon="fa-truck"
+                    attrs="{'invisible': [('delivery_count', '=', 0)]}"
+                    groups="stock.group_stock_user"
+                >
+                        <field name="delivery_count" widget="statinfo" string="Delivery"/>
+                    </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
