@@ -1,8 +1,10 @@
-from odoo import api, models
+from odoo import api, fields, models
 
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
+
+    batch_id = fields.Many2one(related="order_id.batch_id")
 
     def _update_batch_products(self):
         for order_line in self:
