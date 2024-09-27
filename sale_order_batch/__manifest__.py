@@ -13,6 +13,7 @@
         "views/sale_order_views.xml",
         "views/sale_menus.xml",
         "security/ir.model.access.csv",
+        "security/ir_rules.xml",
     ],
     "license": "LGPL-3",
 }

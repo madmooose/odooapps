@@ -5,13 +5,16 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    batch_id = fields.Many2one("sale.order.batch", copy=False)
+    batch_id = fields.Many2one("sale.order.batch", copy=False, check_company=True)
 
     def action_add_to_batch(self):
         """
         TODO: Add Wizard to choose between batches if more than one existis. Picking the first one for now.
         """
-        batch = self.env["sale.order.batch"].search([("state", "=", "open")], limit=1)
+        self = self.with_company(self.company_id)
+        batch = self.env["sale.order.batch"].search(
+            [("state", "=", "open"), ("company_id", "=", self.company_id.id)], limit=1
+        )
         if not batch:
             batch = self.env["sale.order.batch"].create({})
         for sale_order in self:

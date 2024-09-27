@@ -11,11 +11,7 @@ class SaleOrderBatch(models.Model):
     _description = "Sale Order Batch"
     _inherit = "mail.thread"
     _order = "date_order desc, id desc"
-
-    # TODO: add company_id to sale order batch
-    # company_id = fields.Many2one(
-    #     related='order_id.company_id',
-    #     store=True, index=True, precompute=True)
+    _check_company_auto = True
 
     name = fields.Char(
         string="Order Batch Reference",
@@ -24,6 +20,9 @@ class SaleOrderBatch(models.Model):
         readonly=True,
         index="trigram",
         default=lambda self: _("New"),
+    )
+    company_id = fields.Many2one(
+        comodel_name="res.company", required=True, index=True, default=lambda self: self.env.company
     )
     state = fields.Selection(
         selection=[("open", "Open"), ("closed", "Closed")],
