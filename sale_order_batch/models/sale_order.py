@@ -52,5 +52,5 @@ class SaleOrder(models.Model):
                 raise UserError(_(f"Sale Order not in State Draft or Sent: {', '.join(invalid_orders)}"))
         res = super().write(vals)
         if "batch_id" in vals:
-            self.order_line._update_batch_products()
+            self.order_line._update_batch_product()
         return res

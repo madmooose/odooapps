@@ -6,7 +6,7 @@ class SaleOrderLine(models.Model):
 
     batch_id = fields.Many2one(related="order_id.batch_id")
 
-    def _update_batch_products(self):
+    def _update_batch_product(self):
         for order_line in self:
             batch_id = order_line.order_id.batch_id
             if batch_id:
@@ -19,5 +19,5 @@ class SaleOrderLine(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         res = super().create(vals_list)
-        res._update_batch_products()
+        res._update_batch_product()
         return res
