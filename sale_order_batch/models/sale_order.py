@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -42,15 +42,21 @@ class SaleOrder(models.Model):
                 raise UserError(_(f"Sale Order belongs to a Batch: {', '.join(invalid_orders)}"))
         return super().action_confirm()
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("batch_id"):
+                vals["validity_date"] = (
+                    self.env["sale.order.batch"].search([("id", "=", vals.get("batch_id"))]).validity_date
+                )
+        return super().create(vals_list)
+
     def write(self, vals):
-        if "batch_id" in vals:
-            invalid_orders = []
-            for order in self:
-                if order.state not in ["draft", "sent"]:
-                    invalid_orders.append(order.name)
-            if invalid_orders:
-                raise UserError(_(f"Sale Order not in State Draft or Sent: {', '.join(invalid_orders)}"))
+        if vals.get("batch_id"):
+            vals["validity_date"] = (
+                self.env["sale.order.batch"].search([("id", "=", vals.get("batch_id"))]).validity_date
+            )
         res = super().write(vals)
-        if "batch_id" in vals:
+        if vals.get("batch_id"):
             self.order_line._update_batch_product()
         return res
