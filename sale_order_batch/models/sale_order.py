@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    batch_id = fields.Many2one("sale.order.batch", copy=False, check_company=True)
+    batch_id = fields.Many2one("sale.order.batch", copy=False, check_company=True, domain="[('state','!=','closed')]")
 
     def action_add_to_batch(self):
         """

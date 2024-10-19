@@ -36,11 +36,14 @@
                     name="attrs"
                 >{'invisible': ['|',('batch_id','!=',False),('state', 'not in', ['draft'])]}</attribute>
                         </xpath>
+                        <group name="partner_details" position="inside">
+                                <field name="batch_id"/>
+                        </group>
                 </field>
         </record>
 
-        <record id="view_order_list_inherit_batch" model="ir.ui.view">
-                <field name="name">sale.order.list.view.inherited</field>
+        <record id="view_quatation_tree_inherit_batch" model="ir.ui.view">
+                <field name="name">sale.order.tree.inherited.batch</field>
                 <field name="model">sale.order</field>
                 <field name="inherit_id" ref="sale.view_quotation_tree"/>
                 <field name="arch" type="xml">
@@ -49,6 +52,21 @@
                                         <button type="object" name="action_add_to_batch" string="Add to Batch"/>
                                 </header>
                         </xpath>
+                        <xpath expr="//field[@name='name']" position="after">
+                                <field name="batch_id"/>
+                        </xpath>
                 </field>
         </record>
+
+        <record id="view_order_tree_inherit_batch" model="ir.ui.view">
+                <field name="name">sale.order.tree.inherited.batch</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_order_tree"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//field[@name='name']" position="after">
+                                <field name="batch_id"/>
+                        </xpath>
+                </field>
+        </record>
+
 </odoo>

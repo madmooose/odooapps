@@ -99,11 +99,8 @@
                     </group>
                     <notebook>
                         <page string="Sale Orders" name="orders">
-                            <field
-                                name="sale_order_ids"
-                                domain="[('state','in',['draft','sent']),('batch_id','=',False)]"
-                            >
-                                <tree>
+                            <field name="sale_order_ids">
+                                <tree delete="0">
                                     <field name="name"/>
                                     <field name="partner_id"/>
                                     <field name="date_order"/>
