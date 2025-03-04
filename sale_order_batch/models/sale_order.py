@@ -11,14 +11,15 @@ class SaleOrder(models.Model):
         """
         TODO: Add Wizard to choose between batches if more than one existis. Picking the first one for now.
         """
-        self = self.with_company(self.company_id)
-        batch = self.env["sale.order.batch"].search(
-            [("state", "=", "open"), ("company_id", "=", self.company_id.id)], limit=1
-        )
-        if not batch:
-            batch = self.env["sale.order.batch"].create({})
         for sale_order in self:
+            company = sale_order.company_id
+            sale_order = sale_order.with_company(company)
+            batch = self.env["sale.order.batch"].search(
+                [("state", "=", "open"), ("company_id", "=", company.id)], limit=1
+            )
             if not sale_order.batch_id and sale_order.state in ["draft", "sent"]:
+                if not batch:
+                    batch = sale_order.env["sale.order.batch"].create({})
                 sale_order.batch_id = batch
 
     def action_view_sale_order_batch(self):
@@ -29,7 +30,6 @@ class SaleOrder(models.Model):
             "view_mode": "form",
             "res_model": "sale.order.batch",
             "res_id": self.batch_id.id,
-            # 'target': '',
         }
 
     def action_confirm(self):
@@ -41,9 +41,3 @@ class SaleOrder(models.Model):
             if invalid_orders:
                 raise UserError(_(f"Sale Order belongs to a Batch: {', '.join(invalid_orders)}"))
         return super().action_confirm()
-
-    def write(self, vals):
-        res = super().write(vals)
-        if vals.get("batch_id"):
-            self.order_line._update_batch_product()
-        return res

@@ -46,19 +46,13 @@ class SaleOrderBatch(models.Model):
     )
     sale_order_ids = fields.One2many("sale.order", "batch_id")
     sale_order_count = fields.Integer(compute="_compute_sale_order_count")
-    sale_order_line_ids = fields.Many2many("sale.order.line", compute="_compute_sale_order_line_ids", store=True)
+    sale_order_line_ids = fields.One2many("sale.order.line", "batch_id")
     invoice_ids = fields.Many2many("account.move", compute="_compute_invoice_ids")
     invoice_count = fields.Integer(compute="_compute_invoice_ids")
     amount_total = fields.Float(compute="_compute_amount_total", string="Total")
     product_ids = fields.One2many("sale.order.batch.product", "batch_id")
     product_count = fields.Integer(compute="_compute_product_count")
     partner_credit_warning = fields.Text(compute="_compute_partner_credit_warning")
-
-    @api.depends("sale_order_ids.order_line")
-    def _compute_sale_order_line_ids(self):
-        for batch in self:
-            order_lines = self.env["sale.order.line"].search([("order_id", "in", batch.sale_order_ids.ids)])
-            batch.sale_order_line_ids = order_lines
 
     @api.depends("sale_order_ids")
     def _compute_sale_order_count(self):
