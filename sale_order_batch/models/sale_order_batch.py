@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from odoo import _, api, fields, models
 
 
@@ -46,16 +44,6 @@ class SaleOrderBatch(models.Model):
         help="Creation date of order batch,\nConfirmation date of confirmed orders.",
         default=fields.Datetime.now,
     )
-    validity_date = fields.Date(
-        string="Expiration",
-        compute="_compute_validity_date",
-        inverse="_inverse_validity_date",
-        store=True,
-        readonly=False,
-        copy=False,
-        precompute=True,
-        states=READONLY_FIELD_STATES,
-    )
     sale_order_ids = fields.One2many("sale.order", "batch_id")
     sale_order_count = fields.Integer(compute="_compute_sale_order_count")
     sale_order_line_ids = fields.Many2many("sale.order.line", compute="_compute_sale_order_line_ids", store=True)
@@ -65,28 +53,6 @@ class SaleOrderBatch(models.Model):
     product_ids = fields.One2many("sale.order.batch.product", "batch_id")
     product_count = fields.Integer(compute="_compute_product_count")
     partner_credit_warning = fields.Text(compute="_compute_partner_credit_warning")
-
-    @api.depends("company_id")
-    def _compute_validity_date(self):
-        enabled_feature = bool(self.env["ir.config_parameter"].sudo().get_param("sale.use_quotation_validity_days"))
-        if not enabled_feature:
-            self.validity_date = False
-            return
-        today = fields.Date.context_today(self)
-        for batch in self:
-            days = batch.company_id.quotation_validity_days
-            if days > 0:
-                batch.validity_date = today + timedelta(days)
-            else:
-                batch.validity_date = False
-
-    def _inverse_validity_date(self):
-        """
-        Set validity date on all Sale Orders
-        """
-        for batch in self:
-            for order in batch.sale_order_ids:
-                order.validity_date = batch.validity_date
 
     @api.depends("sale_order_ids.order_line")
     def _compute_sale_order_line_ids(self):
