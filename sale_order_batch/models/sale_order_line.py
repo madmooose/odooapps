@@ -10,23 +10,38 @@ class SaleOrderLine(models.Model):
     # TODO:
     # - recompute values on batchproduct
     # - check for last item on unlink or removal ob batch_id and remove batch_product_id
-    @api.depends("batch_id", "batch_product_id")
     def _update_batch_product(self):
         for line in self:
             batch_id = line.batch_id
             if batch_id:
                 batch_product = line.env["sale.order.batch.product"].search(
-                    [("product_id", "=", line.product_id.id), ("batch_id", "=", batch_id.id)]
+                    [("product_id", "=", line.product_id.id), ("batch_id", "=", batch_id.id)], limit=1
                 )
                 if not batch_product:
                     batch_product = line.env["sale.order.batch.product"].create(
                         {"batch_id": batch_id.id, "product_id": line.product_id.id}
                     )
+                line.batch_product_id = batch_product
+            else:
+                line.batch_product_id.unlink()
+                line.batch_product_id = False
 
     @api.model_create_multi
     def create(self, vals_list):
         res = super().create(vals_list)
         for line in res:
             if line.batch_id:
-                res._update_batch_product()
+                line._update_batch_product()
         return res
+
+    def write(self, vals):
+        res = super().write(vals)
+        if vals.get("product_id"):
+            self._update_batch_product()
+        return res
+
+    def unlink(self):
+        for line in self:
+            if line.batch_product_id:
+                line.batch_product_id.unlink()
+        return super().unlink()

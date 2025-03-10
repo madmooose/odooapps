@@ -30,12 +30,6 @@ class SaleOrderBatchProduct(models.Model):
     product_packaging_id = fields.Many2one("product.packaging")
     product_packaging_qty = fields.Float(compute="_compute_product_packaging_qty")
 
-    @api.depends("sale_order_line_ids")
-    def _update_batch_products(self):
-        for product in self:
-            if not product.sale_order_line_ids:
-                product.unlink()
-
     @api.depends("sale_order_line_ids.product_uom_qty")
     def _compute_uom_qty(self):
         for product in self:
@@ -45,3 +39,9 @@ class SaleOrderBatchProduct(models.Model):
     def _compute_product_packaging_qty(self):
         for product in self:
             product.product_packaging_qty = product.product_packaging_id.qty if product.product_packaging_id else 1
+
+    def unlink(self):
+        for product in self:
+            if not product.sale_order_line_ids:
+                return super().unlink()
+        return True

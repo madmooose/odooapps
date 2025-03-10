@@ -41,3 +41,11 @@ class SaleOrder(models.Model):
             if invalid_orders:
                 raise UserError(_(f"Sale Order belongs to a Batch: {', '.join(invalid_orders)}"))
         return super().action_confirm()
+
+    # TODO: Unlink batch_product when no so lines anymore
+    def write(self, vals):
+        res = super().write(vals)
+        if "batch_id" in vals.keys():
+            for order in self:
+                order.order_line._update_batch_product()
+        return res
