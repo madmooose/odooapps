@@ -39,6 +39,7 @@ Changelog
 :1.0.1: rename product creation methode
 :1.1.0: Make validity_date persistent, add batches to SO views
 :1.1.1: Remove validity date
+:2.0.0: Move product logic to sale order lines
 
 Bug Tracker
 ===========

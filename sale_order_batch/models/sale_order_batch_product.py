@@ -39,9 +39,3 @@ class SaleOrderBatchProduct(models.Model):
     def _compute_product_packaging_qty(self):
         for product in self:
             product.product_packaging_qty = product.product_packaging_id.qty if product.product_packaging_id else 1
-
-    def unlink(self):
-        for product in self:
-            if not product.sale_order_line_ids:
-                return super().unlink()
-        return True
