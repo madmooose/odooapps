@@ -22,15 +22,9 @@ class SaleOrderLine(models.Model):
 
     def _unlink_batch_product(self):
         lines_to_unlink = self.filtered(lambda l: l.batch_product_id)
-        batch_product_unlink = self.env["sale.order.batch.product"]
-        for line in lines_to_unlink:
-            if line.batch_product_id:
-                batch_product = line.batch_product_id
-                if len(batch_product.sale_order_line_ids) == 1:
-                    batch_product_unlink += batch_product
-                else:
-                    line.batch_product_id = False
-        batch_product_unlink.unlink()
+        batch_products = lines_to_unlink.mapped("batch_product_id")
+        lines_to_unlink.update({"batch_product_id": False})
+        batch_products.filtered(lambda p: len(p.sale_order_line_ids) == 0).unlink()
 
     def _update_batch_product(self):
         lines_with_batch = self.filtered(lambda l: l.batch_id)
