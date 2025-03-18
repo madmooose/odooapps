@@ -23,8 +23,13 @@
                     </group>
                     <notebook>
                          <page string="Sale Order Lines" name="order_line">
-                            <field name="sale_order_line_ids" widget="section_and_note_one2many">
+                            <field
+                                name="sale_order_line_ids"
+                                widget="section_and_note_one2many"
+                                attrs="{'readonly': [('state', 'in', ('closed'))]}"
+                            >
                                 <tree editable="bottom" create="0">
+                                    <field name="company_id" invisible="1"/>
                                     <field name="sequence" widget="handle"/>
                                     <field name="order_id"/>
                                     <field name="order_partner_id"/>

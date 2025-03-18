@@ -32,7 +32,6 @@ class SaleOrderBatchProduct(models.Model):
         readonly=False,
         precompute=True,
         domain="[('sales', '=', True), ('product_id','=',product_id)]",
-        check_company=True,
     )
     product_packaging_qty = fields.Float(compute="_compute_product_packaging_qty")
 
