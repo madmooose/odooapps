@@ -98,10 +98,10 @@
                     <notebook>
                         <page string="Sale Orders" name="orders">
                             <field name="sale_order_ids">
-                                <tree delete="0">
+                                <tree delete="0" editable="0" create="0">
                                     <field name="name"/>
-                                    <field name="partner_id"/>
-                                    <field name="date_order"/>
+                                    <field name="partner_id" readonly="1"/>
+                                    <field name="date_order" readonly="1"/>
                                     <field name="amount_untaxed"/>
                                     <field name="amount_total"/>
                                     <field name="company_id" invisible="1"/>
@@ -137,8 +137,9 @@
                         </page>
                         <page string="Products" name="products">
                             <field name="product_ids">
-                                <tree create="0">
-                                    <field name="product_template_id"/>
+                                <tree create="0" delete="0">
+                                    <field name="product_template_id" optional="hide"/>
+                                    <field name="product_id"/>
                                     <field name="product_uom_qty"/>
                                     <field name="product_packaging_qty" groups="product.group_stock_packaging"/>
                                     <field name="product_packaging_id" groups="product.group_stock_packaging"/>

@@ -16,10 +16,7 @@ class SaleOrderBatchProduct(models.Model):
         copy=False,
         readonly=True,
     )
-
-    # TODO: compute and store
     product_id = fields.Many2one(comodel_name="product.product", required=True, readonly=True)
-
     product_template_id = fields.Many2one(
         "product.template", related="product_id.product_tmpl_id", string="Product Template"
     )
@@ -27,13 +24,39 @@ class SaleOrderBatchProduct(models.Model):
     product_uom_category_id = fields.Many2one(related="product_id.uom_id.category_id", depends=["product_id"])
     product_uom_qty = fields.Float(compute="_compute_uom_qty", string="Quantity")
     product_uom = fields.Many2one(related="product_id.uom_id")
-    product_packaging_id = fields.Many2one("product.packaging")
+    product_packaging_id = fields.Many2one(
+        comodel_name="product.packaging",
+        string="Packaging",
+        compute="_compute_product_packaging_id",
+        store=True,
+        readonly=False,
+        precompute=True,
+        domain="[('sales', '=', True), ('product_id','=',product_id)]",
+        check_company=True,
+    )
     product_packaging_qty = fields.Float(compute="_compute_product_packaging_qty")
+
+    @api.constrains("product_id", "sale_order_line_ids")
+    def _check_sale_order_line_products(self):
+        for product in self:
+            if any(line.product_id != product.product_id for line in product.sale_order_line_ids):
+                raise ValueError("Product must be the same for all Sale Order Lines")
 
     @api.depends("sale_order_line_ids.product_uom_qty")
     def _compute_uom_qty(self):
         for product in self:
             product.product_uom_qty = sum(product.sale_order_line_ids.mapped("product_uom_qty"))
+
+    @api.depends("product_id", "product_uom_qty", "product_uom")
+    def _compute_product_packaging_id(self):
+        for line in self:
+            # remove packaging if not match the product
+            if line.product_packaging_id.product_id != line.product_id:
+                line.product_packaging_id = False
+            # suggest always the first packaging
+            if line.product_id and line.product_uom_qty and line.product_uom:
+                suggested_packaging = line.product_id.packaging_ids[0] if line.product_id.packaging_ids else False
+                line.product_packaging_id = suggested_packaging or line.product_packaging_id
 
     @api.depends("product_packaging_id")
     def _compute_product_packaging_qty(self):

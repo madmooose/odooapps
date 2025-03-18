@@ -5,7 +5,7 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     batch_id = fields.Many2one(related="order_id.batch_id")
-    batch_product_id = fields.Many2one("sale.order.batch.product")
+    batch_product_id = fields.Many2one("sale.order.batch.product", ondelete="restrict")
 
     def _link_batch_product(self):
         lines_with_batch = self.filtered(lambda l: l.batch_id)
