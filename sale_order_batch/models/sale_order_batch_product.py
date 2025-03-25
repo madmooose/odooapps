@@ -1,5 +1,7 @@
 from odoo import api, fields, models
 
+from .sale_order_batch import READONLY_FIELD_STATES
+
 
 class SaleOrderBatchProduct(models.Model):
     """Show Products available in Sale Order Batch"""
@@ -21,7 +23,7 @@ class SaleOrderBatchProduct(models.Model):
     product_template_id = fields.Many2one(
         "product.template", related="product_id.product_tmpl_id", string="Product Template"
     )
-    sale_order_line_ids = fields.One2many("sale.order.line", "batch_product_id")
+    sale_order_line_ids = fields.One2many("sale.order.line", "batch_product_id", states=READONLY_FIELD_STATES)
     product_uom_category_id = fields.Many2one(related="product_id.uom_id.category_id", depends=["product_id"])
     product_uom_qty = fields.Float(compute="_compute_uom_qty", string="Quantity")
     product_uom = fields.Many2one(related="product_id.uom_id")

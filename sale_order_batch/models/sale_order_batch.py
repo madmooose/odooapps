@@ -1,9 +1,8 @@
 from odoo import _, api, fields, models
 
 
-STATES = [("open", "Open"), ("close", "Close")]
-
-READONLY_FIELD_STATES = {state: [("readonly", True)] for state in {"close"}}
+STATES = [("open", "Open"), ("in_progress", "In Progress"), ("closed", "Closed"), ("cancel", "Cancelled")]
+READONLY_FIELD_STATES = {state: [("readonly", True)] for state in {"closed"}}
 
 
 class SaleOrderBatch(models.Model):
@@ -27,26 +26,20 @@ class SaleOrderBatch(models.Model):
         comodel_name="res.company", required=True, index=True, default=lambda self: self.env.company
     )
     state = fields.Selection(
-        selection=[("open", "Open"), ("closed", "Closed")],
-        string="Status",
-        readonly=True,
-        copy=False,
-        index=True,
-        tracking=1,
-        default="open",
+        selection=STATES, string="Status", readonly=True, copy=False, index=True, tracking=1, default="open"
     )
     date_order = fields.Datetime(
         string="Order Date",
         required=True,
         readonly=False,
         copy=False,
-        states={"closed": [("readonly", True)]},
+        states=READONLY_FIELD_STATES,
         help="Creation date of order batch,\nConfirmation date of confirmed orders.",
         default=fields.Datetime.now,
     )
     sale_order_ids = fields.One2many("sale.order", "batch_id")
     sale_order_count = fields.Integer(compute="_compute_sale_order_count")
-    sale_order_line_ids = fields.One2many("sale.order.line", "batch_id")
+    sale_order_line_ids = fields.One2many("sale.order.line", "batch_id", states=READONLY_FIELD_STATES)
     invoice_ids = fields.Many2many("account.move", compute="_compute_invoice_ids")
     invoice_count = fields.Integer(compute="_compute_invoice_ids")
     amount_total = fields.Float(compute="_compute_amount_total", string="Total")
@@ -126,11 +119,26 @@ class SaleOrderBatch(models.Model):
         action["context"] = {"default_move_type": "out_invoice"}
         return action
 
+    def action_in_progress(self):
+        for batch in self:
+            batch.sale_order_line_ids._validate_analytic_distribution()
+            orders = batch.sale_order_ids
+            orders.update({"state": "sent"})
+            batch.update({"state": "in_progress"})
+        return True
+
     def action_confirm(self):
         for batch in self:
             orders = batch.with_context(bypass_batch=True).sale_order_ids
             orders.action_confirm()
-            batch.state = "closed"
+            batch.update({"state": "closed"})
+        return True
+
+    def action_cancel(self):
+        for batch in self:
+            orders = batch.sale_order_ids
+            orders.action_cancel()
+            batch.update({"state": "cancel"})
         return True
 
     @api.model_create_multi

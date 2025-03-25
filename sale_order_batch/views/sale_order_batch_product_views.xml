@@ -5,6 +5,9 @@
         <field name="model">sale.order.batch.product</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <field name="state" invisible="1"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                     </div>
@@ -23,12 +26,7 @@
                     </group>
                     <notebook>
                          <page string="Sale Order Lines" name="order_line">
-                            <field name="state" invisible="1"/>
-                            <field
-                                name="sale_order_line_ids"
-                                widget="section_and_note_one2many"
-                                attrs="{'readonly': [('state', '=', 'closed')]}"
-                            >
+                            <field name="sale_order_line_ids" widget="section_and_note_one2many">
                                 <tree editable="bottom" create="0">
                                     <field name="company_id" invisible="1"/>
                                     <field name="sequence" widget="handle"/>
