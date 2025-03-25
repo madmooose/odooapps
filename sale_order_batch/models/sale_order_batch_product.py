@@ -16,6 +16,7 @@ class SaleOrderBatchProduct(models.Model):
         copy=False,
         readonly=True,
     )
+    state = fields.Selection(related="batch_id.state")
     product_id = fields.Many2one(comodel_name="product.product", required=True, readonly=True)
     product_template_id = fields.Many2one(
         "product.template", related="product_id.product_tmpl_id", string="Product Template"
