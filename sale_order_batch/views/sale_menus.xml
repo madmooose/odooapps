@@ -2,11 +2,24 @@
 <odoo>
 
     <menuitem
+        id="menu_quotation_batch"
+        action="action_quotation_batch"
+        parent="sale.sale_order_menu"
+        groups="sales_team.group_sale_salesman"
+        sequence="15"
+    />
+    <menuitem
         id="menu_sale_order_batch"
-        name="Order Batches"
-        action="action_batch"
+        action="action_order_batch"
         parent="sale.sale_order_menu"
         groups="sales_team.group_sale_salesman"
         sequence="25"
+    />
+
+    <menuitem
+        id="menu_sale_order_batch_invoice"
+        action="action_batch_to_invoice"
+        parent="sale.menu_sale_invoicing"
+        sequence="15"
     />
 </odoo>

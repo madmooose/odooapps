@@ -1,5 +1,7 @@
 from odoo import _, api, fields, models
 
+from odoo.addons.sale.models.sale_order import INVOICE_STATUS
+
 
 STATES = [("open", "Open"), ("in_progress", "In Progress"), ("closed", "Closed"), ("cancel", "Cancelled")]
 READONLY_FIELD_STATES = {state: [("readonly", True)] for state in {"closed"}}
@@ -42,6 +44,7 @@ class SaleOrderBatch(models.Model):
     sale_order_line_ids = fields.One2many("sale.order.line", "batch_id", states=READONLY_FIELD_STATES)
     invoice_ids = fields.Many2many("account.move", compute="_compute_invoice_ids")
     invoice_count = fields.Integer(compute="_compute_invoice_ids")
+    invoice_status = fields.Selection(selection=INVOICE_STATUS, compute="_compute_invoice_status", store=True)
     amount_total = fields.Float(compute="_compute_amount_total", string="Total")
     product_ids = fields.One2many("sale.order.batch.product", "batch_id")
     product_count = fields.Integer(compute="_compute_product_count")
@@ -58,6 +61,25 @@ class SaleOrderBatch(models.Model):
             invoices = batch.sale_order_ids.mapped("invoice_ids")
             batch.invoice_ids = invoices
             batch.invoice_count = len(invoices)
+
+    @api.depends("sale_order_ids.invoice_status")
+    def _compute_invoice_status(self):
+        for batch in self:
+            if batch.sale_order_ids and any(
+                invoice_status == "to invoice" for invoice_status in batch.sale_order_ids.mapped("invoice_status")
+            ):
+                batch.invoice_status = "to invoice"
+            elif batch.sale_order_ids and all(
+                invoice_status == "invoiced" for invoice_status in batch.sale_order_ids.mapped("invoice_status")
+            ):
+                batch.invoice_status = "invoiced"
+            elif batch.sale_order_ids and all(
+                invoice_status in ("invoiced", "upselling")
+                for invoice_status in batch.sale_order_ids.mapped("invoice_status")
+            ):
+                batch.invoice_status = "upselling"
+            else:
+                batch.invoice_status = "no"
 
     @api.depends("sale_order_ids.amount_total")
     def _compute_amount_total(self):

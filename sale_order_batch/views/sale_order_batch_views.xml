@@ -10,6 +10,14 @@
                 <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1"/>
                 <field name="company_id" groups="!base.group_multi_company" invisible="1"/>
                 <field name="sale_order_ids" widget="many2many_tags"/>
+                <field
+                    name="invoice_status"
+                    decoration-success="invoice_status == 'invoiced'"
+                    decoration-info="invoice_status == 'to invoice'"
+                    decoration-warning="invoice_status == 'upselling'"
+                    widget="badge"
+                    optional="show"
+                />
                 <field name="state"/>
             </tree>
         </field>
@@ -185,18 +193,40 @@
         <field name="arch" type="xml">
             <search>
                 <filter string="Active" name="filter_batch_open" domain="[('state', 'in', ['open', 'in_progress'])]"/>
-                <filter string="To Invoice" name="filter_batch_to_invoice" domain="[('state', '=', 'closed')]"/>
+                <filter string="Finished" name="filter_batch_finished" domain="[('state', '=', 'closed')]"/>
                 <filter string="Cancelled" name="filter_batch_cancel" domain="[('state', '=', 'cancel')]"/>
             </search>
         </field>
     </record>
 
-
-    <record id="action_batch" model="ir.actions.act_window">
-        <field name="name">Sale Order Batches</field>
+    <record id="action_quotation_batch" model="ir.actions.act_window">
+        <field name="name">Quotation Batches</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sale.order.batch</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,activity</field>
         <field name="context">{'search_default_filter_batch_open': 1}</field>
+    </record>
+
+    <record id="action_order_batch" model="ir.actions.act_window">
+        <field name="name">Order Batches</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order.batch</field>
+        <field name="view_mode">tree,form,activity</field>
+        <field name="context">{'search_default_filter_batch_finished': 1}</field>
+    </record>
+
+    <record id="action_batch_to_invoice" model="ir.actions.act_window">
+        <field name="name">Batches to Invoice</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order.batch</field>
+        <field name="view_mode">tree,form,activity</field>
+        <field name="context">{'create': False}</field>
+        <field name="domain">[('invoice_status','=','to invoice')]</field>
+        <field name="search_view_id" ref="sale_order_batch_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No batches to invoice found
+            </p>
+        </field>
     </record>
 </odoo>

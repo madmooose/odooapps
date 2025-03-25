@@ -5,3 +5,4 @@
 :1.1.1: Remove validity date
 :2.0.0: Move product logic to sale order lines
 :2.1.0: Add "In Progress" and "Cancelled" state
+:2.1.0: Add invoice status and menues
