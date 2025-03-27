@@ -7,6 +7,16 @@ class SaleOrder(models.Model):
 
     batch_id = fields.Many2one("sale.order.batch", copy=False, check_company=True, domain="[('state','!=','closed')]")
 
+    def _get_current_batch(self):
+        """
+        Returns the current batch of the sale order.
+        :return: sale.order.batch
+        """
+        self.ensure_one()
+        return self.env["sale.order.batch"].search(
+            [("state", "=", "open"), ("company_id", "=", self.company_id.id)], limit=1
+        )
+
     def action_add_to_batch(self):
         """
         TODO: Add Wizard to choose between batches if more than one existis. Picking the first one for now.
@@ -14,10 +24,8 @@ class SaleOrder(models.Model):
         for sale_order in self:
             company = sale_order.company_id
             sale_order = sale_order.with_company(company)
-            batch = self.env["sale.order.batch"].search(
-                [("state", "=", "open"), ("company_id", "=", company.id)], limit=1
-            )
             if not sale_order.batch_id and sale_order.state in ["draft", "sent"]:
+                batch = sale_order._get_current_batch()
                 if not batch:
                     batch = sale_order.env["sale.order.batch"].create({})
                 sale_order.batch_id = batch
