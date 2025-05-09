@@ -53,7 +53,7 @@ class SaleOrderBatchProduct(models.Model):
     def _compute_product_packaging_id(self):
         for line in self:
             # remove packaging if not match the product
-            if line.product_packaging_id.product_id != line.product_id:
+            if line.product_packaging_id and line.product_packaging_id.product_id != line.product_id:
                 line.product_packaging_id = False
             # suggest always the first packaging
             if line.product_id and line.product_uom_qty and line.product_uom:
