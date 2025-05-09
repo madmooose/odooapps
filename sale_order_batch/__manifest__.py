@@ -4,7 +4,7 @@
     "author": "BAKEUP",
     "website": "https://www.bakeup.org",
     "category": "Sale",
-    "version": "16.0.2.2.0",
+    "version": "16.0.2.2.1",
     "depends": ["sale", "product"],
     "data": [
         "data/ir_sequence_data.xml",

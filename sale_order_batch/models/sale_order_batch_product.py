@@ -27,6 +27,13 @@ class SaleOrderBatchProduct(models.Model):
     product_uom_category_id = fields.Many2one(related="product_id.uom_id.category_id", depends=["product_id"])
     product_uom_qty = fields.Float(compute="_compute_uom_qty", string="Quantity")
     product_uom = fields.Many2one(related="product_id.uom_id")
+    lst_price = fields.Float(
+        "Sales Price",
+        related="product_id.lst_price",
+        digits="Product Price",
+        help="""The sale price is managed from the product template. Click on the
+        'Configure Variants' button to set the extra attribute prices.""",
+    )
     product_packaging_id = fields.Many2one(
         comodel_name="product.packaging",
         string="Packaging",
