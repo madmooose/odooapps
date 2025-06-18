@@ -25,7 +25,9 @@ class SaleOrderBatchProduct(models.Model):
     )
     sale_order_line_ids = fields.One2many("sale.order.line", "batch_product_id", states=READONLY_FIELD_STATES)
     product_uom_category_id = fields.Many2one(related="product_id.uom_id.category_id", depends=["product_id"])
-    product_uom_qty = fields.Float(compute="_compute_uom_qty", string="Quantity")
+    product_uom_qty = fields.Float(
+        string="Quantity", compute="_compute_uom_qty", precompute=True, store=True, digits=[12, 3]
+    )
     product_uom = fields.Many2one(related="product_id.uom_id")
     lst_price = fields.Float(
         "Sales Price",

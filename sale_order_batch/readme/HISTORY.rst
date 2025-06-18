@@ -7,3 +7,4 @@
 :2.1.0: Add "In Progress" and "Cancelled" state
 :2.2.0: Add invoice status and menues
 :2.2.1: Add lst_price to view
+:2.2.2: store all quantities and round open values
