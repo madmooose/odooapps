@@ -3,7 +3,12 @@ from odoo import _, api, fields, models
 from odoo.addons.sale.models.sale_order import INVOICE_STATUS
 
 
-STATES = [("open", "Open"), ("in_progress", "In Progress"), ("closed", "Closed"), ("cancel", "Cancelled")]
+STATES = [
+    ("open", "Open"),
+    ("in_progress", "In Progress"),
+    ("closed", "Closed"),
+    ("cancel", "Cancelled"),
+]
 READONLY_FIELD_STATES = {state: [("readonly", True)] for state in {"closed"}}
 
 
@@ -25,10 +30,19 @@ class SaleOrderBatch(models.Model):
         default=lambda self: _("New"),
     )
     company_id = fields.Many2one(
-        comodel_name="res.company", required=True, index=True, default=lambda self: self.env.company
+        comodel_name="res.company",
+        required=True,
+        index=True,
+        default=lambda self: self.env.company,
     )
     state = fields.Selection(
-        selection=STATES, string="Status", readonly=True, copy=False, index=True, tracking=1, default="open"
+        selection=STATES,
+        string="Status",
+        readonly=True,
+        copy=False,
+        index=True,
+        tracking=1,
+        default="open",
     )
     date_order = fields.Datetime(
         string="Order Date",
@@ -41,10 +55,14 @@ class SaleOrderBatch(models.Model):
     )
     sale_order_ids = fields.One2many("sale.order", "batch_id")
     sale_order_count = fields.Integer(compute="_compute_sale_order_count")
-    sale_order_line_ids = fields.One2many("sale.order.line", "batch_id", states=READONLY_FIELD_STATES)
+    sale_order_line_ids = fields.One2many(
+        "sale.order.line", "batch_id", states=READONLY_FIELD_STATES
+    )
     invoice_ids = fields.Many2many("account.move", compute="_compute_invoice_ids")
     invoice_count = fields.Integer(compute="_compute_invoice_ids")
-    invoice_status = fields.Selection(selection=INVOICE_STATUS, compute="_compute_invoice_status", store=True)
+    invoice_status = fields.Selection(
+        selection=INVOICE_STATUS, compute="_compute_invoice_status", store=True
+    )
     amount_total = fields.Float(compute="_compute_amount_total", string="Total")
     product_ids = fields.One2many("sale.order.batch.product", "batch_id")
     product_count = fields.Integer(compute="_compute_product_count")
@@ -66,11 +84,13 @@ class SaleOrderBatch(models.Model):
     def _compute_invoice_status(self):
         for batch in self:
             if batch.sale_order_ids and any(
-                invoice_status == "to invoice" for invoice_status in batch.sale_order_ids.mapped("invoice_status")
+                invoice_status == "to invoice"
+                for invoice_status in batch.sale_order_ids.mapped("invoice_status")
             ):
                 batch.invoice_status = "to invoice"
             elif batch.sale_order_ids and all(
-                invoice_status == "invoiced" for invoice_status in batch.sale_order_ids.mapped("invoice_status")
+                invoice_status == "invoiced"
+                for invoice_status in batch.sale_order_ids.mapped("invoice_status")
             ):
                 batch.invoice_status = "invoiced"
             elif batch.sale_order_ids and all(
@@ -113,11 +133,15 @@ class SaleOrderBatch(models.Model):
 
     def action_view_products(self):
         self.ensure_one()
-        result = self.env["ir.actions.act_window"]._for_xml_id("product.product_normal_action_sell")
+        result = self.env["ir.actions.act_window"]._for_xml_id(
+            "product.product_normal_action_sell"
+        )
         if len(self.product_ids) > 1:
             result["domain"] = [("id", "in", self.product_ids.ids)]
         elif len(self.product_ids) == 1:
-            result["views"] = [(self.env.ref("product.product_product_tree_view", False).id, "form")]
+            result["views"] = [
+                (self.env.ref("product.product_product_tree_view", False).id, "form")
+            ]
             result["res_id"] = self.product_ids.id
         else:
             result = {"type": "ir.actions.act_window_close"}
@@ -125,13 +149,17 @@ class SaleOrderBatch(models.Model):
 
     def action_view_invoice(self):
         invoices = self.mapped("invoice_ids")
-        action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_out_invoice_type")
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            "account.action_move_out_invoice_type"
+        )
         if len(invoices) > 1:
             action["domain"] = [("id", "in", invoices.ids)]
         elif len(invoices) == 1:
             form_view = [(self.env.ref("account.view_move_form").id, "form")]
             if "views" in action:
-                action["views"] = form_view + [(state, view) for state, view in action["views"] if view != "form"]
+                action["views"] = form_view + [
+                    (state, view) for state, view in action["views"] if view != "form"
+                ]
             else:
                 action["views"] = form_view
             action["res_id"] = invoices.id
@@ -169,5 +197,7 @@ class SaleOrderBatch(models.Model):
             if "company_id" in vals:
                 self = self.with_company(vals["company_id"])
             if vals.get("name", _("New")) == _("New"):
-                vals["name"] = self.env["ir.sequence"].next_by_code("sale.order.batch") or _("New")
+                vals["name"] = self.env["ir.sequence"].next_by_code(
+                    "sale.order.batch"
+                ) or _("New")
         return super().create(vals_list)

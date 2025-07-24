@@ -12,7 +12,11 @@ class SaleOrderLine(models.Model):
         for line in lines_with_batch:
             batch_id = line.batch_id
             batch_product = self.env["sale.order.batch.product"].search(
-                [("product_id", "=", line.product_id.id), ("batch_id", "=", batch_id.id)], limit=1
+                [
+                    ("product_id", "=", line.product_id.id),
+                    ("batch_id", "=", batch_id.id),
+                ],
+                limit=1,
             )
             if not batch_product:
                 batch_product = self.env["sale.order.batch.product"].create(
@@ -30,7 +34,8 @@ class SaleOrderLine(models.Model):
         lines_with_batch = self.filtered(lambda l: l.batch_id)
         lines_without_batch = self - lines_with_batch
         lines_with_batch.filtered(
-            lambda l: l.batch_product_id and l.batch_product_id.product_id != l.product_id
+            lambda l: l.batch_product_id
+            and l.batch_product_id.product_id != l.product_id
         )._unlink_batch_product()
         lines_with_batch._link_batch_product()
         lines_without_batch._unlink_batch_product()
