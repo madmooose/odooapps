@@ -1,0 +1,4 @@
+- 16.0.1.0.0: Initial module
+- 16.0.1.0.1: Fix security rules
+- 16.0.1.0.2: Add tests
+- 16.0.1.0.3: Add and use default image field
