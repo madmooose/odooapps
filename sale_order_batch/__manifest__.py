@@ -4,7 +4,7 @@
     "author": "BAKEUP",
     "website": "https://www.bakeup.org",
     "category": "Sale",
-    "version": "16.0.2.3.0",
+    "version": "16.0.2.3.1",
     "depends": ["sale", "product"],
     "data": [
         "security/ir.model.access.csv",

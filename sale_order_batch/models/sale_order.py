@@ -62,6 +62,11 @@ class SaleOrder(models.Model):
                 )
         return super().action_confirm()
 
+    def action_cancel(self):
+        self.write({"batch_id": False})
+        res = super().action_cancel()
+        return res
+
     def write(self, vals):
         res = super().write(vals)
         if "batch_id" in vals.keys():

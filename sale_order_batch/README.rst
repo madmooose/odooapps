@@ -34,16 +34,17 @@ anymore as log as they are part of a batch. Only Sale Orders in state Qutotation
 Changelog
 =========
 
-:16.0.0.0.1: Initial module.
-:16.0.0.1: Add Multi Company ability
-:16.0.0.2: rename product creation methode
-:16.0.0.3: Make validity_date persistent, add batches to SO views
-:16.0.0.4: Remove validity date
-:16.0.0.5: Move product logic to sale order lines
-:16.0.2.1.0: Add "In Progress" and "Cancelled" state
-:16.0.2.2.0: Add invoice status and menues
-:16.0.2.2.1: Add lst_price to view
-:16.0.2.3.0: Add "Reset to Open"
+- 16.0.0.0.1: Initial module.
+- 16.0.0.1: Add Multi Company ability
+- 16.0.0.2: rename product creation methode
+- 16.0.0.3: Make validity_date persistent, add batches to SO views
+- 16.0.0.4: Remove validity date
+- 16.0.0.5: Move product logic to sale order lines
+- 16.0.2.1.0: Add "In Progress" and "Cancelled" state
+- 16.0.2.2.0: Add invoice status and menues
+- 16.0.2.2.1: Add lst_price to view
+- 16.0.2.3.0: Add "Reset to Open"
+- 16.0.2.3.1: Remove Sale Order from batch on cancelation
 
 Bug Tracker
 ===========
