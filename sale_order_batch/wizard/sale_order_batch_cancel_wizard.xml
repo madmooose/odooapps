@@ -1,0 +1,24 @@
+<odoo>
+    <record id="view_sale_order_batch_cancel_wizard_form" model="ir.ui.view">
+        <field name="name">sale.order.batch.cancel.wizard.form</field>
+        <field name="model">sale.order.batch.cancel.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group col="1">
+                    <div col="2" class="alert alert-warning" role="alert">
+                        <span>Are you sure you want to cancel this order?</span>
+                    </div>
+                    <group col="2">
+                        <field name="batch_ids" invisible="1"/>
+                        <field name="order_ids" widget="many2many_tags"/>
+
+                    </group>
+                </group>
+                <footer>
+                    <button string="Cancel" name="action_cancel" type="object" class="btn-primary mx-1"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

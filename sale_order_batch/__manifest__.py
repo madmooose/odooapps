@@ -7,13 +7,14 @@
     "version": "16.0.2.3.0",
     "depends": ["sale", "product"],
     "data": [
-        "data/ir_sequence_data.xml",
+        "security/ir.model.access.csv",
+        "security/ir_rules.xml",
         "views/sale_order_batch_views.xml",
         "views/sale_order_batch_product_views.xml",
         "views/sale_order_views.xml",
         "views/sale_menus.xml",
-        "security/ir.model.access.csv",
-        "security/ir_rules.xml",
+        "wizard/sale_order_batch_cancel_wizard.xml",
+        "data/ir_sequence_data.xml",
     ],
     "license": "LGPL-3",
 }

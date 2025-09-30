@@ -11,6 +11,10 @@ class SaleOrder(models.Model):
         check_company=True,
         domain="[('state','!=','closed')]",
     )
+    batch_state = fields.Selection(
+        related="batch_id.state",
+        string="Batch State",
+    )
 
     def _get_current_batch(self):
         """

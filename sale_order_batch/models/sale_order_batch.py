@@ -1,4 +1,5 @@
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 from odoo.addons.sale.models.sale_order import INVOICE_STATUS
 
@@ -185,13 +186,37 @@ class SaleOrderBatch(models.Model):
         return True
 
     def action_cancel(self):
-        for batch in self:
-            orders = batch.sale_order_ids
-            # use _action_cancel to skip the wizzard
-            # ToDo: Implement wizard logic
-            orders._action_cancel()
-            batch.update({"state": "cancel"})
-        return True
+        cancel_warning = self._show_cancel_wizard()
+        if cancel_warning:
+            self.ensure_one()
+            return {
+                "name": _("Cancel %s", self.name),
+                "view_mode": "form",
+                "type": "ir.actions.act_window",
+                "res_model": "sale.order.batch.cancel.wizard",
+                "target": "new",
+                "context": {"active_ids": self.ids},
+            }
+        else:
+            self._action_cancel()
+
+    def _action_cancel(self):
+        orders = self.mapped("sale_order_ids")
+        # use _action_cancel to skip the wizzard
+        orders._action_cancel()
+        self.write({"state": "cancel"})
+
+    def _show_cancel_wizard(self):
+        """Decide whether the sale.order.batch.cancel wizard should be shown to cancel specified orders.
+
+        :return: True if there is any non-draft order in the given orders
+        :rtype: bool
+        """
+
+        if self.env.context.get("disable_cancel_warning"):
+            return False
+        batch_orders = self.mapped("sale_order_ids")
+        return any(order._show_cancel_wizard() for order in batch_orders)
 
     def action_open(self):
         for batch in self:
@@ -210,3 +235,29 @@ class SaleOrderBatch(models.Model):
                     "sale.order.batch"
                 ) or _("New")
         return super().create(vals_list)
+
+
+class SaleOrderBatchCancelWizard(models.TransientModel):
+    _name = "sale.order.batch.cancel.wizard"
+    _description = "Sale Order Batch Cancel Wizard"
+
+    def action_cancel(self):
+        batches = self.env["sale.order.batch"].browse(self._context["active_ids"])
+        for batch in batches:
+            orders = batch.sale_order_ids
+            # Warn if any sale order is not in draft
+            not_draft_orders = orders.filtered(lambda o: o.state != "draft")
+            if not_draft_orders:
+                raise UserError(
+                    _(
+                        "You can only cancel batches where all sale orders are in draft state."
+                    )
+                )
+            # use _action_cancel to skip the wizzard
+            # ToDo: Implement wizard logic
+            orders._action_cancel()
+            batch.update({"state": "cancel"})
+        return True
+
+    def action_discard(self):
+        return {"type": "ir.actions.act_window_close"}
