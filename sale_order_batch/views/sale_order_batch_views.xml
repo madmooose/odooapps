@@ -77,6 +77,15 @@
                         type="object"
                         attrs="{'invisible': [('state', 'not in',['open', 'in_progress','closed'])]}"
                     />
+                    <button
+                        name="action_open"
+                        id="action_open"
+                        data-hotkey="w"
+                        string="Set to Open"
+                        class="btn-primary"
+                        type="object"
+                        states="cancel"
+                    />
                     <field name="state" widget="statusbar"/>
                 </header>
                 <div

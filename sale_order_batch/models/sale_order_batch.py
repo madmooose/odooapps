@@ -187,8 +187,17 @@ class SaleOrderBatch(models.Model):
     def action_cancel(self):
         for batch in self:
             orders = batch.sale_order_ids
-            orders.action_cancel()
+            # use _action_cancel to skip the wizzard
+            # ToDo: Implement wizard logic
+            orders._action_cancel()
             batch.update({"state": "cancel"})
+        return True
+
+    def action_open(self):
+        for batch in self:
+            orders = batch.sale_order_ids
+            orders.action_draft()
+            batch.update({"state": "open"})
         return True
 
     @api.model_create_multi

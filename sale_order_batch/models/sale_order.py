@@ -24,7 +24,8 @@ class SaleOrder(models.Model):
 
     def action_add_to_batch(self):
         """
-        TODO: Add Wizard to choose between batches if more than one existis. Picking the first one for now.
+        TODO: Add Wizard to choose between batches if more than one existis.
+        Picking the first one for now.
         """
         for sale_order in self:
             company = sale_order.company_id
