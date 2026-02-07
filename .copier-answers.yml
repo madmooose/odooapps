@@ -1,6 +1,7 @@
 # Do NOT update manually; changes here will be overwritten by Copier
 _commit: v1.37
 _src_path: https://github.com/OCA/oca-addons-repo-template
+additional_ruff_rules: []
 ci: GitHub
 convert_readme_fragments_to_markdown: false
 enable_checklog_odoo: true
@@ -22,6 +23,6 @@ repo_description: Open Source Odoo Apps i develop and maintain for projects of m
 repo_name: madmooose OSS Odoo Apps
 repo_slug: odooapps
 repo_website: https://ziemlichoptimal.de
-use_pyproject_toml: false
-use_ruff: false
+use_pyproject_toml: true
+use_ruff: true
 
