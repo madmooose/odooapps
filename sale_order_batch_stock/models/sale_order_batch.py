@@ -1,6 +1,5 @@
 from odoo import api, fields, models
 
-
 STATES = [("open", "Open"), ("close", "Close")]
 
 
