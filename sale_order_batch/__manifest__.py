@@ -1,0 +1,20 @@
+{
+    "name": "Sale Order Batch",
+    "summary": "Group Sale Orders into a batch",
+    "author": "BAKEUP,Niels Göttsch",
+    "website": "https://ziemlichoptimal.de",
+    "category": "Sale",
+    "version": "16.0.2.3.1",
+    "depends": ["sale", "product"],
+    "data": [
+        "security/ir.model.access.csv",
+        "security/ir_rules.xml",
+        "views/sale_order_batch_views.xml",
+        "views/sale_order_batch_product_views.xml",
+        "views/sale_order_views.xml",
+        "views/sale_menus.xml",
+        "wizard/sale_order_batch_cancel_wizard.xml",
+        "data/ir_sequence_data.xml",
+    ],
+    "license": "LGPL-3",
+}
