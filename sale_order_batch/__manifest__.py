@@ -1,8 +1,8 @@
 {
     "name": "Sale Order Batch",
     "summary": "Group Sale Orders into a batch",
-    "author": "BAKEUP",
-    "website": "https://www.bakeup.org",
+    "author": "BAKEUP,Niels Göttsch",
+    "website": "https://ziemlichoptimal.de",
     "category": "Sale",
     "version": "16.0.2.3.1",
     "depends": ["sale", "product"],

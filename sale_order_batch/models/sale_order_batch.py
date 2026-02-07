@@ -3,7 +3,6 @@ from odoo.exceptions import UserError
 
 from odoo.addons.sale.models.sale_order import INVOICE_STATUS
 
-
 STATES = [
     ("open", "Open"),
     ("in_progress", "In Progress"),
@@ -207,7 +206,8 @@ class SaleOrderBatch(models.Model):
         self.write({"state": "cancel"})
 
     def _show_cancel_wizard(self):
-        """Decide whether the sale.order.batch.cancel wizard should be shown to cancel specified orders.
+        """Decide whether the sale.order.batch.cancel wizard should be shown to cancel
+           specified orders.
 
         :return: True if there is any non-draft order in the given orders
         :rtype: bool
@@ -250,7 +250,8 @@ class SaleOrderBatchCancelWizard(models.TransientModel):
             if not_draft_orders:
                 raise UserError(
                     _(
-                        "You can only cancel batches where all sale orders are in draft state."
+                        "You can only cancel batches where all sale orders are in "
+                        "draft state."
                     )
                 )
             # use _action_cancel to skip the wizzard
