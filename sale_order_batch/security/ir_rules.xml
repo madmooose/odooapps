@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo noupdate="1">
 
     <!-- Multi - Company Rules -->
     <record id="sale_order_batch_comp_rule" model="ir.rule">
         <field name="name">Sales Order Batch multi-company</field>
-        <field name="model_id" ref="model_sale_order_batch"/>
+        <field name="model_id" ref="model_sale_order_batch" />
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 

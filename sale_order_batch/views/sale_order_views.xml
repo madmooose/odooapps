@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
         <record id="view_order_form" model="ir.ui.view">
                 <field name="name">sale.order.form.inherit.batch</field>
                 <field name="model">sale.order</field>
-                <field name="inherit_id" ref="sale.view_order_form"/>
+                <field name="inherit_id" ref="sale.view_order_form" />
                 <field name="arch" type="xml">
                         <xpath expr="//button[@name='action_draft']" position="after">
-                                <field name="batch_id" invisible="True"/>
+                                <field name="batch_id" invisible="True" />
                                 <button
                     name="action_add_to_batch"
                     type="object"
@@ -23,21 +23,30 @@
                     icon="fa-tasks"
                     attrs="{'invisible': [('batch_id', '=', False)]}"
                 >
-                                        <field name="batch_id" attrs="{'readonly': True}"/>
+                                        <field
+                        name="batch_id"
+                        attrs="{'readonly': True}"
+                    />
                                 </button>
                         </xpath>
-                        <xpath expr="//button[@name='action_confirm']" position="attributes">
+                        <xpath
+                expr="//button[@name='action_confirm']"
+                position="attributes"
+            >
                                 <attribute
                     name="attrs"
                 >{'invisible': ['|',('batch_id','!=',False),('state', 'not in', ['sent'])]}</attribute>
                         </xpath>
-                        <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                        <xpath
+                expr="//button[@name='action_confirm'][2]"
+                position="attributes"
+            >
                                 <attribute
                     name="attrs"
                 >{'invisible': ['|',('batch_id','!=',False),('state', 'not in', ['draft'])]}</attribute>
                         </xpath>
                         <group name="partner_details" position="inside">
-                                <field name="batch_id"/>
+                                <field name="batch_id" />
                         </group>
                 </field>
         </record>
@@ -45,15 +54,19 @@
         <record id="view_quatation_tree_inherit_batch" model="ir.ui.view">
                 <field name="name">sale.order.tree.inherited.batch</field>
                 <field name="model">sale.order</field>
-                <field name="inherit_id" ref="sale.view_quotation_tree"/>
+                <field name="inherit_id" ref="sale.view_quotation_tree" />
                 <field name="arch" type="xml">
                         <xpath expr="//tree" position="inside">
                                 <header>
-                                        <button type="object" name="action_add_to_batch" string="Add to Batch"/>
+                                        <button
+                        type="object"
+                        name="action_add_to_batch"
+                        string="Add to Batch"
+                    />
                                 </header>
                         </xpath>
                         <xpath expr="//field[@name='name']" position="after">
-                                <field name="batch_id"/>
+                                <field name="batch_id" />
                         </xpath>
                 </field>
         </record>
@@ -61,10 +74,10 @@
         <record id="view_order_tree_inherit_batch" model="ir.ui.view">
                 <field name="name">sale.order.tree.inherited.batch</field>
                 <field name="model">sale.order</field>
-                <field name="inherit_id" ref="sale.view_order_tree"/>
+                <field name="inherit_id" ref="sale.view_order_tree" />
                 <field name="arch" type="xml">
                         <xpath expr="//field[@name='name']" position="after">
-                                <field name="batch_id"/>
+                                <field name="batch_id" />
                         </xpath>
                 </field>
         </record>

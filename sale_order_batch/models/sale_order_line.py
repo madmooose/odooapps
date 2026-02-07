@@ -8,7 +8,7 @@ class SaleOrderLine(models.Model):
     batch_product_id = fields.Many2one("sale.order.batch.product", ondelete="restrict")
 
     def _link_batch_product(self):
-        lines_with_batch = self.filtered(lambda l: l.batch_id)
+        lines_with_batch = self.filtered(lambda line: line.batch_id)
         for line in lines_with_batch:
             batch_id = line.batch_id
             batch_product = self.env["sale.order.batch.product"].search(
@@ -25,17 +25,17 @@ class SaleOrderLine(models.Model):
             line.batch_product_id = batch_product
 
     def _unlink_batch_product(self):
-        lines_to_unlink = self.filtered(lambda l: l.batch_product_id)
+        lines_to_unlink = self.filtered(lambda line: line.batch_product_id)
         batch_products = lines_to_unlink.mapped("batch_product_id")
         lines_to_unlink.update({"batch_product_id": False})
         batch_products.filtered(lambda p: len(p.sale_order_line_ids) == 0).unlink()
 
     def _update_batch_product(self):
-        lines_with_batch = self.filtered(lambda l: l.batch_id)
+        lines_with_batch = self.filtered(lambda line: line.batch_id)
         lines_without_batch = self - lines_with_batch
         lines_with_batch.filtered(
-            lambda l: l.batch_product_id
-            and l.batch_product_id.product_id != l.product_id
+            lambda line: line.batch_product_id
+            and line.batch_product_id.product_id != line.product_id
         )._unlink_batch_product()
         lines_with_batch._link_batch_product()
         lines_without_batch._unlink_batch_product()
