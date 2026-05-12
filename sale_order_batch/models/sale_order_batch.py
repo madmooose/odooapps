@@ -172,8 +172,8 @@ class SaleOrderBatch(models.Model):
     def action_in_progress(self):
         for batch in self:
             batch.sale_order_line_ids._validate_analytic_distribution()
-            orders = batch.sale_order_ids
-            orders.update({"state": "sent"})
+            orders = batch.with_context(bypass_batch=True).sale_order_ids
+            orders.action_quotation_sent()
             batch.update({"state": "in_progress"})
         return True
 
