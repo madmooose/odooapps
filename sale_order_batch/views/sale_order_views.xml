@@ -30,6 +30,22 @@
                                 </button>
                         </xpath>
                         <xpath
+                expr="//button[@name='action_quotation_send'][@states='draft']"
+                position="attributes"
+            >
+                                <attribute
+                    name="attrs"
+                >{'invisible': [('batch_id', '!=', False)]}</attribute>
+                        </xpath>
+                        <xpath
+                expr="//button[@name='action_quotation_send'][@states='sent,sale']"
+                position="attributes"
+            >
+                                <attribute
+                    name="attrs"
+                >{'invisible': [('batch_id', '!=', False)]}</attribute>
+                        </xpath>
+                        <xpath
                 expr="//button[@name='action_confirm']"
                 position="attributes"
             >

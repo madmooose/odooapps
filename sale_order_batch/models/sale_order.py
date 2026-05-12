@@ -34,7 +34,7 @@ class SaleOrder(models.Model):
         for sale_order in self:
             company = sale_order.company_id
             sale_order = sale_order.with_company(company)
-            if not sale_order.batch_id and sale_order.state in ["draft", "sent"]:
+            if not sale_order.batch_id and sale_order.state in ["draft"]:
                 batch = sale_order._get_current_batch()
                 if not batch:
                     batch = sale_order.env["sale.order.batch"].create({})
@@ -49,6 +49,18 @@ class SaleOrder(models.Model):
             "res_model": "sale.order.batch",
             "res_id": self.batch_id.id,
         }
+
+    def action_quotation_send(self):
+        invalid_orders = []
+        if not self.env.context.get("bypass_batch", False):
+            for order in self:
+                if order.batch_id:
+                    invalid_orders.append(order.name)
+            if invalid_orders:
+                raise UserError(
+                    _(f"Sale Order belongs to a Batch: {', '.join(invalid_orders)}")
+                )
+        return super().action_quotation_send()
 
     def action_confirm(self):
         invalid_orders = []
