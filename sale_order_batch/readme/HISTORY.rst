@@ -9,3 +9,4 @@
 - 16.0.2.2.1: Add lst_price to view
 - 16.0.2.3.0: Add "Reset to Open"
 - 16.0.2.3.1: Remove Sale Order from batch on cancelation
+- 16.0.2.4.0: Add Followers on In Progress & add tests
