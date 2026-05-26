@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- This XML record extends the product attribute form view to include the 'visible_in_ecommerce' field -->
+    <record id="view_product_attribute_value_form" model="ir.ui.view">
+        <field name="name">product.attribute.form</field>
+        <field name="model">product.attribute</field>
+        <field name="inherit_id" ref="product.product_attribute_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='is_custom']" position="after">
+                <field name="visible_in_ecommerce" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

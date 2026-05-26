@@ -1,0 +1,1 @@
+- 16.0.1.0.0: Adds visibility control for variant values in e-commerce.

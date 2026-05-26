@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="products_attributes" inherit_id="website_sale.products_attributes">
+        <xpath expr="//t[@t-foreach='attributes']/div" position="attributes">
+            <attribute
+                name="t-if"
+            >a.value_ids.filtered(lambda v: v.visible_in_ecommerce) and len(a.value_ids.filtered(lambda v: v.visible_in_ecommerce)) &gt; 1
+            </attribute>
+        </xpath>
+        <xpath
+            expr="//t[@t-if=&quot;a.display_type == 'select'&quot;]//t"
+            position="attributes"
+        >
+            <attribute
+                name="t-foreach"
+            >a.value_ids.filtered(lambda v: v.visible_in_ecommerce)</attribute>
+        </xpath>
+        <xpath
+            expr="//t[@t-if=&quot;a.display_type == 'radio' or a.display_type == 'pills'&quot;]//t"
+            position="attributes"
+        >
+            <attribute
+                name="t-foreach"
+            >a.value_ids.filtered(lambda v: v.visible_in_ecommerce)</attribute>
+        </xpath>
+        <xpath
+            expr="//div[@t-if=&quot;a.display_type == 'color'&quot;]//t"
+            position="attributes"
+        >
+            <attribute
+                name="t-foreach"
+            >a.value_ids.filtered(lambda v: v.visible_in_ecommerce)</attribute>
+        </xpath>
+    </template>
+    <template id="o_wsale_offcanvas" inherit_id="website_sale.o_wsale_offcanvas">
+        <xpath expr="//t[@t-foreach='attributes']//div" position="attributes">
+            <attribute
+                name="t-if"
+            >a.value_ids.filtered(lambda v: v.visible_in_ecommerce) and len(a.value_ids.filtered(lambda v: v.visible_in_ecommerce)) &gt; 1</attribute>
+        </xpath>
+        <xpath expr="//div[@t-foreach='a.value_ids']" position="attributes">
+            <attribute
+                name="t-foreach"
+            >a.value_ids.filtered(lambda v: v.visible_in_ecommerce)</attribute>
+        </xpath>
+        <xpath
+            expr="//t[@t-foreach='attributes']//div[hasclass('accordion-body')]//t[@t-foreach='a.value_ids']"
+            position="attributes"
+        >
+            <attribute
+                name="t-foreach"
+            >a.value_ids.filtered(lambda v: v.visible_in_ecommerce)</attribute>
+        </xpath>
+    </template>
+</odoo>
