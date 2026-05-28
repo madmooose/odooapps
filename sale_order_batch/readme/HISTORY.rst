@@ -10,3 +10,4 @@
 - 16.0.2.3.0: Add "Reset to Open"
 - 16.0.2.3.1: Remove Sale Order from batch on cancelation
 - 16.0.2.4.0: Add Followers on In Progress & add tests
+- 16.0.2.3.2: Add unique ids for confirm button
