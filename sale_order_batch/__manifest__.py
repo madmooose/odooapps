@@ -4,7 +4,7 @@
     "author": "BAKEUP,Niels Göttsch",
     "website": "https://ziemlichoptimal.de",
     "category": "Sale",
-    "version": "16.0.2.3.1",
+    "version": "16.0.2.3.2",
     "depends": ["sale", "product"],
     "data": [
         "security/ir.model.access.csv",

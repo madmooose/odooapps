@@ -85,21 +85,21 @@
                     />
                     <button
                         name="action_confirm"
-                        id="action_confirm"
-                        data-hotkey="v"
-                        string="Confirm"
-                        class="btn-secondary"
-                        type="object"
-                        attrs="{'invisible': [('state', 'not in',['open'])]}"
-                    />
-                    <button
-                        name="action_confirm"
-                        id="action_confirm"
+                        id="action_confirm_primary"
                         data-hotkey="v"
                         string="Confirm"
                         class="btn-primary"
                         type="object"
                         attrs="{'invisible': [('state', 'not in',['in_progress'])]}"
+                    />
+                    <button
+                        name="action_confirm"
+                        id="action_confirm_secondary"
+                        data-hotkey="v"
+                        string="Confirm"
+                        class="btn-secondary"
+                        type="object"
+                        attrs="{'invisible': [('state', 'not in',['open'])]}"
                     />
                     <button
                         id="create_invoices"
